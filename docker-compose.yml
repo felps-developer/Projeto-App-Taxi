@@ -1,0 +1,35 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    command: sh -c "npm run build && npm start"
+    environment:
+      - DATABASE_URL=postgresql://postgres:admin@db:5432/AppTaxi?schema=public
+    depends_on:
+      - db
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:3000" # Porta para o frontend
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5433:5432"  # Porta externa 5433 mapeada para a porta interna 5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: AppTaxi
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+
